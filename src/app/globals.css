@@ -126,3 +126,75 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* BlockNote remove ALL horizontal padding */
+.bn-container,
+.bn-editor,
+.bn-block-outer,
+.bn-block-content,
+.ProseMirror {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Print Styles for PDF Export */
+@media print {
+  /* Hide everything except the proposal content */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only show the proposal editor and its parents */
+  #proposal-content,
+  #proposal-content * {
+    visibility: visible;
+  }
+
+  /* Position the proposal at the top of the page */
+  #proposal-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide buttons in print */
+  button {
+    display: none !important;
+  }
+
+  /* Clean up card styling for print */
+  .border {
+    border: none !important;
+  }
+
+  /* Optimize page breaks */
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+
+  ul,
+  ol {
+    page-break-inside: avoid;
+  }
+
+  /* Remove shadows and backgrounds */
+  * {
+    box-shadow: none !important;
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Ensure readable font sizes */
+  body {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 2cm;
+  }
+}

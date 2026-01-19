@@ -199,19 +199,24 @@ feat(phase-3): implement content assembly system
 - `src/components/proposal-editor.tsx` - BlockNote editor component
 
 ### Files Updated:
-- `src/app/globals.css` - Added @source directive for BlockNote styles
+- `src/app/globals.css` - Added @source directive for BlockNote styles, removed BlockNote shadcn (switched to Mantine)
 - `src/components/proposal-form.tsx` - Integrated editor, added regenerate button
-- `package.json` - Added BlockNote dependencies
+- `src/components/ui/select.tsx` - Commented out Portal for potential compatibility
+- `src/components/ui/dropdown-menu.tsx` - Added, Portals commented out (not used)
+- `src/components/ui/popover.tsx` - Added, Portals commented out (not used)
+- `package.json` - Added BlockNote dependencies (switched from shadcn to Mantine)
 
 ### Key Implementation Details:
-- Using `@blocknote/shadcn` for consistent UI with existing components
+- ⚠️ **Changed from `@blocknote/shadcn` to `@blocknote/mantine`** - shadcn had keyboard navigation issues
+- Using `@blocknote/mantine` (official default) with `@mantine/core` and `@mantine/hooks`
 - `convertProposalToBlocks()` converts ProposalSection[] to BlockNote format
 - Helper functions for headings, paragraphs, bullet lists
 - Editor updates automatically when regenerating content
-- onChange callback for tracking content changes
 - Full editing capabilities with BlockNote's rich text features
+- Light theme enabled with `theme="light"` prop
+- Keyboard navigation (slash menu, arrow keys) fully functional
 
-### Commit:
+### Commits:
 ```
 feat(phase-4): integrate blocknote editor for editable proposals
 
@@ -224,26 +229,101 @@ feat(phase-4): integrate blocknote editor for editable proposals
 - refactor converter to reduce complexity (split into helper functions)
 ```
 
+```
+fix(phase-4): switch blocknote to mantine ui for working keyboard navigation
+
+- replace @blocknote/shadcn with @blocknote/mantine for proper functionality
+- install @mantine/core and @mantine/hooks dependencies
+- remove custom shadcn component passing which caused keyboard nav issues
+- add dropdown-menu and popover shadcn components (commented portals for future use)
+- update select component to remove portal for blocknote compatibility
+- set editor theme to light mode
+- update plan-progress to reflect phase 3 and 4 completion
+```
+
 ### Testing Notes:
 - Editor initializes with generated content
 - Full editing capabilities working
+- **Keyboard navigation fully functional** (slash menu, arrow keys, enter)
 - Regenerate button updates editor content
 - Type checking and lint passing
 - Responsive layout maintained
+- Light theme rendering correctly
 
 ---
 
-## 🖨️ Phase 5: Preview & PDF Export - NOT STARTED
+## ✅ Phase 5: Split-View Layout & PDF Export - COMPLETE
 
-**Status:** ⏸️ PENDING
+**Status:** ✅ COMPLETE
+**Completed:** January 19, 2026
 
-### Remaining Tasks:
-- [ ] Build split-view layout
-- [ ] Create preview component
-- [ ] Implement CSS `@media print` rules
-- [ ] Add "Exportar PDF" button
-- [ ] Implement `window.print()` functionality
-- [ ] Test PDF output formatting
+### Tasks Completed:
+- ✅ Install Tabs component from shadcn
+- ✅ Refactor proposal-form into split-view layout
+  - Desktop: Form (left 45%) | Proposal (right 55%)
+  - Mobile: Tabs (Formulário | Proposta)
+- ✅ Extract reusable FormContent and ProposalContent components
+- ✅ Implement responsive breakpoints (md+ for split, mobile for tabs)
+- ✅ Add "Exportar PDF" button with `window.print()` integration
+- ✅ Create CSS `@media print` rules for clean PDF output
+- ✅ Add #proposal-content ID for print targeting
+
+### Files Created:
+- `src/components/ui/tabs.tsx` - shadcn Tabs component
+
+### Files Updated:
+- `src/components/proposal-form.tsx` - Complete refactor with split view and tabs
+- `src/components/proposal-editor.tsx` - Added #proposal-content ID for print
+- `src/app/globals.css` - Added comprehensive @media print styles
+
+### Key Implementation Details:
+- **Desktop Split View (md+):**
+  - CSS Grid with 45%/55% columns
+  - Form scrollable on left
+  - Proposal sticky on right with fixed height
+- **Mobile Tabs:**
+  - shadcn Tabs component with "Formulário" and "Proposta" tabs
+  - Defaults to Proposta tab (shows generated content first)
+  - Clean tab switching UX
+- **PDF Export:**
+  - "📄 Exportar PDF" button calls `window.print()`
+  - @media print hides everything except #proposal-content
+  - Removes buttons, borders, shadows
+  - Clean black & white print output
+  - Optimized page breaks for headings and lists
+  - 2cm margins via @page rule
+- **UX Improvements:**
+  - Before generation: centered single-column form (max-w-3xl)
+  - After generation: split view with form + proposal side-by-side
+  - Regenerate and Export buttons in proposal header
+  - Submit button only shows before first generation
+
+### Commit:
+```
+feat(phase-5): implement split-view layout and pdf export
+
+- add tabs component from shadcn for mobile navigation
+- refactor proposal-form into responsive split-view layout
+- desktop: form (45%) left, proposal (55%) right with sticky positioning
+- mobile: tabs component (formulário | proposta)
+- extract reusable formcontent and proposalcontent components
+- add "exportar pdf" button with window.print() integration
+- create comprehensive @media print styles for clean pdf output
+- hide non-proposal content in print (buttons, borders, backgrounds)
+- optimize page breaks for headings and lists
+- add #proposal-content id for print targeting
+- before generation: centered form, after: split view
+- remove unused oncontentchange parameter from proposaleditor
+```
+
+### Testing Notes:
+- Split view renders correctly on desktop (md+ breakpoints)
+- Mobile tabs work properly with clean switching
+- PDF export opens print dialog
+- Print preview shows clean proposal content only
+- Regenerate updates both form and proposal views
+- Type checking passing
+- Lint passing (intentional !important in print CSS for override)
 
 ---
 
@@ -264,21 +344,22 @@ feat(phase-4): integrate blocknote editor for editable proposals
 
 ## Summary
 
-**Overall Progress:** 4/6 phases complete (67%)
+**Overall Progress:** 5/6 phases complete (83%)
 
 **Next Steps:**
-1. Begin Phase 5: Preview & PDF Export
-2. Build split-view layout (editor | preview)
-3. Create preview component with print-optimized styling
-4. Implement CSS @media print rules
-5. Add "Exportar PDF" button with window.print()
+1. Begin Phase 6: Polish & Testing
+2. Cross-browser testing (Safari, Firefox, Chrome)
+3. Mobile device testing
+4. Accessibility audit
+5. Performance optimization
+6. Error handling improvements
 
 **Completed Phases:**
 - ✅ Phase 1: Foundation & Data Flow
 - ✅ Phase 2: AI Integration (Vercel AI SDK + OpenRouter)
 - ✅ Phase 3: Content Assembly (Templates + Assembler)
-- ✅ Phase 4: BlockNote Editor Integration
+- ✅ Phase 4: BlockNote Editor Integration (Mantine UI)
+- ✅ Phase 5: Split-View Layout & PDF Export
 
 **Remaining Phases:**
-- ⏸️ Phase 5: Preview & PDF Export
 - ⏸️ Phase 6: Polish & Testing

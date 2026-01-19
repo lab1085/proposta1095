@@ -10,10 +10,9 @@ import type { ProposalSection } from "@/types/proposal";
 
 interface ProposalEditorProps {
   sections: ProposalSection[];
-  onContentChange?: (content: string) => void;
 }
 
-export function ProposalEditor({ sections, onContentChange }: ProposalEditorProps) {
+export function ProposalEditor({ sections }: ProposalEditorProps) {
   // Create editor instance
   const editor = useCreateBlockNote({
     initialContent: convertProposalToBlocks(sections),
@@ -28,7 +27,7 @@ export function ProposalEditor({ sections, onContentChange }: ProposalEditorProp
   }, [sections, editor]);
 
   return (
-    <div className="min-h-[600px] rounded-lg border border-border bg-card">
+    <div id="proposal-content">
       <BlockNoteView editor={editor} theme="light" />
     </div>
   );

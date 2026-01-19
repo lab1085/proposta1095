@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import type {
   FormErrors,
@@ -176,27 +177,9 @@ export function ProposalForm() {
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 p-6">
-      <div className="space-y-2">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Gerador de Propostas</h1>
-            <p className="text-muted-foreground">
-              Preencha os dados para gerar sua proposta comercial
-            </p>
-          </div>
-          <Button
-            type="button"
-            onClick={loadTestData}
-            variant="outline"
-            className="w-full sm:w-auto"
-          >
-            🧪 Carregar Dados de Teste
-          </Button>
-        </div>
-      </div>
-
+  // Form Content Component (reusable for both split view and tabs)
+  const FormContent = () => (
+    <>
       {/* Client Information */}
       <Card>
         <CardHeader>
@@ -361,33 +344,105 @@ export function ProposalForm() {
         </Card>
       )}
 
-      {/* Generated Proposal with BlockNote Editor */}
-      {proposalSections && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                variant="outline"
-                size="sm"
-              >
-                🔄 Regenerar
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ProposalEditor sections={proposalSections} />
-          </CardContent>
-        </Card>
+      {/* Submit Button - only show if no proposal generated */}
+      {!proposalSections && (
+        <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
+          {isSubmitting ? "Gerando proposta..." : "Gerar Proposta"}
+        </Button>
       )}
+    </>
+  );
 
-      {/* Submit Button */}
-      <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
-        {isSubmitting ? "Gerando proposta..." : "Gerar Proposta"}
-      </Button>
+  // Proposal Content Component (reusable for both split view and tabs)
+  const ProposalContent = () => (
+    <Card className="h-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
+          <div className="flex gap-2">
+            <Button type="button" onClick={() => window.print()} variant="outline" size="sm">
+              📄 Exportar PDF
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              variant="outline"
+              size="sm"
+            >
+              🔄 Regenerar
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ProposalEditor sections={proposalSections || []} />
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <form onSubmit={handleSubmit} className="h-full">
+      <div className="mx-auto max-w-7xl space-y-6 p-3 sm:p-6">
+        <div className="space-y-2">
+          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Gerador de Propostas
+              </h1>
+              <p className="text-sm text-muted-foreground sm:text-base">
+                Preencha os dados para gerar sua proposta comercial
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={loadTestData}
+              variant="outline"
+              className="w-full sm:w-auto"
+            >
+              🧪 Carregar Dados de Teste
+            </Button>
+          </div>
+        </div>
+
+        {/* Before proposal is generated - single column form */}
+        {!proposalSections && (
+          <div className="mx-auto max-w-3xl space-y-8">
+            <FormContent />
+          </div>
+        )}
+
+        {/* After proposal is generated - split view on desktop, tabs on mobile */}
+        {proposalSections && (
+          <>
+            {/* Desktop Split View (hidden on mobile/tablet) */}
+            <div className="hidden gap-6 lg:grid lg:grid-cols-[45%_55%]">
+              <div className="space-y-8 overflow-y-auto">
+                <FormContent />
+              </div>
+              <div className="sticky top-6 h-[calc(100vh-8rem)] overflow-y-auto">
+                <ProposalContent />
+              </div>
+            </div>
+
+            {/* Mobile/Tablet Tabs (hidden on desktop) */}
+            <div className="lg:hidden">
+              <Tabs defaultValue="proposal" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="form">Formulário</TabsTrigger>
+                  <TabsTrigger value="proposal">Proposta</TabsTrigger>
+                </TabsList>
+                <TabsContent value="form" className="space-y-8">
+                  <FormContent />
+                </TabsContent>
+                <TabsContent value="proposal">
+                  <ProposalContent />
+                </TabsContent>
+              </Tabs>
+            </div>
+          </>
+        )}
+      </div>
     </form>
   );
 }
