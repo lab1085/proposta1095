@@ -1,8 +1,8 @@
 "use client";
 
 import "@blocknote/core/fonts/inter.css";
-import { BlockNoteView } from "@blocknote/shadcn";
-import "@blocknote/shadcn/style.css";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
 import { useCreateBlockNote } from "@blocknote/react";
 import { useEffect } from "react";
 import { convertProposalToBlocks } from "@/lib/blocknote-converter";
@@ -28,16 +28,8 @@ export function ProposalEditor({ sections, onContentChange }: ProposalEditorProp
   }, [sections, editor]);
 
   return (
-    <div className="rounded-lg border border-border bg-background">
-      <BlockNoteView
-        editor={editor}
-        onChange={() => {
-          if (onContentChange) {
-            const blocks = editor.document;
-            onContentChange(JSON.stringify(blocks));
-          }
-        }}
-      />
+    <div className="min-h-[600px] rounded-lg border border-border bg-card">
+      <BlockNoteView editor={editor} theme="light" />
     </div>
   );
 }

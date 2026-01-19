@@ -131,35 +131,105 @@ feat(phase-2): integrate vercel ai sdk with openrouter
 - Form shows loading state during generation
 - Error messages display on API failures
 
-## 📋 Phase 3: Content Assembly - NOT STARTED
+## 📋 Phase 3: Content Assembly - COMPLETE
 
-**Status:** ⏸️ PENDING
+**Status:** ✅ COMPLETE
+**Completed:** January 19, 2026
 
-### Remaining Tasks:
-- [ ] Create template sections:
+### Tasks Completed:
+- ✅ Create template sections:
   - Capa (logo, client name, date)
   - Sobre nós (fixed institutional text)
   - Próximos passos (fixed CTA text)
   - Validade (30 days standard)
-- [ ] Build content assembly function
-- [ ] Define proposal structure/order
-- [ ] Format content for BlockNote consumption
-- [ ] Create helper functions for content transformation
+- ✅ Build content assembly function
+- ✅ Define proposal structure/order
+- ✅ Create helper functions for content transformation
+
+### Files Created:
+- `src/lib/templates.ts` - Template generation functions
+- `src/lib/assembler.ts` - Content assembly and formatting functions
+
+### Files Updated:
+- `src/app/api/generate-proposal/route.ts` - Now returns assembled proposal with sections
+- `src/components/proposal-form.tsx` - Added test data button, displays structured sections
+
+### Key Implementation Details:
+- `generateTemplateSections()` creates dynamic templates with client data
+- Portuguese locale date formatting (pt-BR)
+- `assembleProposal()` merges form + AI + templates into complete proposal
+- `createProposalSections()` structures content into 10 organized sections
+- Test data button for faster development workflow
+
+### Commit:
+```
+feat(phase-3): implement content assembly system
+
+- create template generator with dynamic sections
+- build content assembler for complete proposals
+- add test data button for development
+- structure proposal into 10 organized sections
+- integrate templates and ai content
+```
+
+### Testing Notes:
+- Complete proposal structure with all sections
+- Test data loads realistic coffee shop scenario
+- Sections display in proper order
+- All content properly formatted
 
 ---
 
-## ✏️ Phase 4: BlockNote Editor Integration - NOT STARTED
+## ✏️ Phase 4: BlockNote Editor Integration - COMPLETE
 
-**Status:** ⏸️ PENDING
+**Status:** ✅ COMPLETE
+**Completed:** January 19, 2026
 
-### Remaining Tasks:
-- [ ] Install BlockNote dependencies
-- [ ] Create BlockNote editor component
-- [ ] Convert proposal structure to BlockNote schema
-- [ ] Initialize editor with generated content
-- [ ] Enable full editing capabilities
-- [ ] Implement "Regenerar" button
-- [ ] Handle editor state management
+### Tasks Completed:
+- ✅ Install BlockNote dependencies
+- ✅ Create BlockNote editor component
+- ✅ Convert proposal structure to BlockNote schema
+- ✅ Initialize editor with generated content
+- ✅ Enable full editing capabilities
+- ✅ Implement "Regenerar" button
+- ✅ Handle editor state management
+
+### Files Created:
+- `src/lib/blocknote-converter.ts` - Schema conversion with helper functions
+- `src/components/proposal-editor.tsx` - BlockNote editor component
+
+### Files Updated:
+- `src/app/globals.css` - Added @source directive for BlockNote styles
+- `src/components/proposal-form.tsx` - Integrated editor, added regenerate button
+- `package.json` - Added BlockNote dependencies
+
+### Key Implementation Details:
+- Using `@blocknote/shadcn` for consistent UI with existing components
+- `convertProposalToBlocks()` converts ProposalSection[] to BlockNote format
+- Helper functions for headings, paragraphs, bullet lists
+- Editor updates automatically when regenerating content
+- onChange callback for tracking content changes
+- Full editing capabilities with BlockNote's rich text features
+
+### Commit:
+```
+feat(phase-4): integrate blocknote editor for editable proposals
+
+- install blocknote packages (core, react, shadcn)
+- create blocknote-converter with helper functions for schema conversion
+- build proposal-editor component with blocknote integration
+- replace card-based display with editable blocknote editor
+- add regenerate button to re-run ai generation
+- configure tailwindcss @source directive for blocknote styles
+- refactor converter to reduce complexity (split into helper functions)
+```
+
+### Testing Notes:
+- Editor initializes with generated content
+- Full editing capabilities working
+- Regenerate button updates editor content
+- Type checking and lint passing
+- Responsive layout maintained
 
 ---
 
@@ -194,20 +264,21 @@ feat(phase-2): integrate vercel ai sdk with openrouter
 
 ## Summary
 
-**Overall Progress:** 3/6 phases complete (50%)
+**Overall Progress:** 4/6 phases complete (67%)
 
 **Next Steps:**
-1. Begin Phase 4: BlockNote Editor Integration
-2. Install BlockNote dependencies (@blocknote/core, @blocknote/react)
-3. Create BlockNote editor component
-4. Convert proposal sections to BlockNote schema
-5. Implement "Regenerar" functionality
+1. Begin Phase 5: Preview & PDF Export
+2. Build split-view layout (editor | preview)
+3. Create preview component with print-optimized styling
+4. Implement CSS @media print rules
+5. Add "Exportar PDF" button with window.print()
 
-**Overall Progress:** 3/6 phases complete (50%)
+**Completed Phases:**
+- ✅ Phase 1: Foundation & Data Flow
+- ✅ Phase 2: AI Integration (Vercel AI SDK + OpenRouter)
+- ✅ Phase 3: Content Assembly (Templates + Assembler)
+- ✅ Phase 4: BlockNote Editor Integration
 
-**Next Steps:**
-1. Begin Phase 4: BlockNote Editor Integration
-2. Install BlockNote dependencies (@blocknote/core, @blocknote/react)
-3. Create BlockNote editor component
-4. Convert proposal sections to BlockNote schema
-5. Implement "Regenerar" functionality
+**Remaining Phases:**
+- ⏸️ Phase 5: Preview & PDF Export
+- ⏸️ Phase 6: Polish & Testing
