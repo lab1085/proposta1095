@@ -146,8 +146,10 @@
 
   /* Only show the proposal editor and its parents */
   #proposal-content,
-  #proposal-content * {
-    visibility: visible;
+  #proposal-content *,
+  #proposal-content .ProseMirror,
+  #proposal-content .ProseMirror * {
+    visibility: visible !important;
   }
 
   /* Position the proposal at the top of the page */
@@ -156,11 +158,16 @@
     left: 0;
     top: 0;
     width: 100%;
+    padding: 0 !important;
   }
 
-  /* Hide buttons in print */
-  button {
+  /* Hide buttons and interactive elements in print */
+  button,
+  .bn-side-menu,
+  .bn-drag-handle,
+  .bn-block-side-menu {
     display: none !important;
+    visibility: hidden !important;
   }
 
   /* Clean up card styling for print */

@@ -1,8 +1,8 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
-import { useState } from "react";
-import { ProposalEditor } from "@/components/proposal-editor";
+import { useEffect, useRef, useState } from "react";
+import { ProposalEditor, type ProposalEditorRef } from "@/components/proposal-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,8 @@ interface DeliverableItem {
 }
 
 export function ProposalForm() {
+  const editorRef = useRef<ProposalEditorRef>(null);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [formData, setFormData] = useState<ProposalFormData>({
     clientName: "",
     company: "",
@@ -56,6 +58,14 @@ export function ProposalForm() {
   const [_proposal, setProposal] = useState<ProposalContent | null>(null);
   const [proposalSections, setProposalSections] = useState<ProposalSection[] | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Detect screen size - only render one layout at a time
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const validateForm = (data: ProposalFormData = formData): boolean => {
     const newErrors: FormErrors = {};
@@ -353,14 +363,19 @@ export function ProposalForm() {
     </>
   );
 
-  // Proposal Content Component (reusable for both split view and tabs)
-  const ProposalContent = () => (
+  // Single Proposal Card - renders editor only once
+  const ProposalCard = () => (
     <Card className="h-full">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
           <div className="flex gap-2">
-            <Button type="button" onClick={() => window.print()} variant="outline" size="sm">
+            <Button
+              type="button"
+              onClick={() => editorRef.current?.exportToPDF()}
+              variant="outline"
+              size="sm"
+            >
               📄 Exportar PDF
             </Button>
             <Button
@@ -376,7 +391,7 @@ export function ProposalForm() {
         </div>
       </CardHeader>
       <CardContent>
-        <ProposalEditor sections={proposalSections || []} />
+        {proposalSections && <ProposalEditor ref={editorRef} sections={proposalSections} />}
       </CardContent>
     </Card>
   );
@@ -412,35 +427,33 @@ export function ProposalForm() {
           </div>
         )}
 
-        {/* After proposal is generated - split view on desktop, tabs on mobile */}
-        {proposalSections && (
-          <>
-            {/* Desktop Split View (hidden on mobile/tablet) */}
-            <div className="hidden gap-6 lg:grid lg:grid-cols-[45%_55%]">
-              <div className="space-y-8 overflow-y-auto">
-                <FormContent />
-              </div>
-              <div className="sticky top-6 h-[calc(100vh-8rem)] overflow-y-auto">
-                <ProposalContent />
-              </div>
+        {/* After proposal - ONE editor, conditional layout based on screen size */}
+        {proposalSections && isDesktop && (
+          /* Desktop Split View */
+          <div className="grid gap-6 grid-cols-[45%_55%]">
+            <div className="space-y-8 overflow-y-auto">
+              <FormContent />
             </div>
+            <div className="sticky top-6 h-[calc(100vh-8rem)] overflow-y-auto">
+              <ProposalCard />
+            </div>
+          </div>
+        )}
 
-            {/* Mobile/Tablet Tabs (hidden on desktop) */}
-            <div className="lg:hidden">
-              <Tabs defaultValue="proposal" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="form">Formulário</TabsTrigger>
-                  <TabsTrigger value="proposal">Proposta</TabsTrigger>
-                </TabsList>
-                <TabsContent value="form" className="space-y-8">
-                  <FormContent />
-                </TabsContent>
-                <TabsContent value="proposal">
-                  <ProposalContent />
-                </TabsContent>
-              </Tabs>
-            </div>
-          </>
+        {proposalSections && !isDesktop && (
+          /* Mobile/Tablet Tabs */
+          <Tabs defaultValue="proposal" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="form">Formulário</TabsTrigger>
+              <TabsTrigger value="proposal">Proposta</TabsTrigger>
+            </TabsList>
+            <TabsContent value="form" className="space-y-8">
+              <FormContent />
+            </TabsContent>
+            <TabsContent value="proposal">
+              <ProposalCard />
+            </TabsContent>
+          </Tabs>
         )}
       </div>
     </form>

@@ -2,6 +2,61 @@ import type { Block, PartialBlock } from "@blocknote/core";
 import type { ProposalSection } from "@/types/proposal";
 
 /**
+ * Parse markdown inline styles (bold, italic) and convert to BlockNote format
+ */
+function parseMarkdownText(text: string): Array<{
+  type: "text";
+  text: string;
+  styles: {
+    bold?: boolean;
+    italic?: boolean;
+  };
+}> {
+  const result: Array<{
+    type: "text";
+    text: string;
+    styles: { bold?: boolean; italic?: boolean };
+  }> = [];
+
+  // Regex to match **bold** and *italic*
+  const regex = /(\*\*([^*]+)\*\*)|(\*([^*]+)\*)|([^*]+)/g;
+  let match: RegExpExecArray | null = null;
+
+  match = regex.exec(text);
+  while (match !== null) {
+    if (match[2]) {
+      // Bold text (**text**)
+      result.push({
+        type: "text",
+        text: match[2],
+        styles: { bold: true },
+      });
+    } else if (match[4]) {
+      // Italic text (*text*)
+      result.push({
+        type: "text",
+        text: match[4],
+        styles: { italic: true },
+      });
+    } else if (match[5]) {
+      // Plain text
+      const plainText = match[5];
+      if (plainText) {
+        result.push({
+          type: "text",
+          text: plainText,
+          styles: {},
+        });
+      }
+    }
+
+    match = regex.exec(text);
+  }
+
+  return result.length > 0 ? result : [{ type: "text", text: text, styles: {} }];
+}
+
+/**
  * Create heading block
  */
 function createHeadingBlock(title: string): PartialBlock {
@@ -10,13 +65,7 @@ function createHeadingBlock(title: string): PartialBlock {
     props: {
       level: 2,
     },
-    content: [
-      {
-        type: "text",
-        text: title,
-        styles: { bold: true },
-      },
-    ],
+    content: parseMarkdownText(title),
   };
 }
 
@@ -28,37 +77,95 @@ function createBulletListBlocks(items: string[]): PartialBlock[] {
     .filter((item) => item.trim())
     .map((item) => ({
       type: "bulletListItem",
-      content: [
-        {
-          type: "text",
-          text: item,
-          styles: {},
-        },
-      ],
+      content: parseMarkdownText(item),
     }));
 }
 
 /**
  * Create paragraph blocks from text content
+ * Also handles numbered lists embedded in text
  */
 function createParagraphBlocks(content: string): PartialBlock[] {
-  const paragraphs = content.split("\n\n").filter((p) => p.trim());
+  const blocks: PartialBlock[] = [];
+  const lines = content.split("\n").filter((l) => l.trim());
 
-  return paragraphs.map((para) => {
-    const lines = para.split("\n").filter((l) => l.trim());
-    const text = lines.join(" ");
+  let currentParagraph: string[] = [];
+  let inNumberedList = false;
+  const numberedListItems: string[] = [];
 
-    return {
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+
+    // Check if line is a numbered list item (e.g., "1. Item" or "2. **Bold**: text")
+    const numberedListMatch = trimmedLine.match(/^\d+\.\s+(.+)$/);
+
+    if (numberedListMatch) {
+      // If we were building a paragraph, finish it first
+      if (currentParagraph.length > 0) {
+        blocks.push({
+          type: "paragraph",
+          content: parseMarkdownText(currentParagraph.join(" ")),
+        });
+        currentParagraph = [];
+      }
+
+      // Add to numbered list items
+      numberedListItems.push(numberedListMatch[1]);
+      inNumberedList = true;
+    } else if (trimmedLine === "") {
+      // Empty line - end current context
+      if (inNumberedList && numberedListItems.length > 0) {
+        // Create numbered list blocks
+        blocks.push(
+          ...numberedListItems.map((item) => ({
+            type: "numberedListItem" as const,
+            content: parseMarkdownText(item),
+          }))
+        );
+        numberedListItems.length = 0;
+        inNumberedList = false;
+      } else if (currentParagraph.length > 0) {
+        blocks.push({
+          type: "paragraph",
+          content: parseMarkdownText(currentParagraph.join(" ")),
+        });
+        currentParagraph = [];
+      }
+    } else {
+      // Regular line
+      if (inNumberedList) {
+        // End numbered list, start paragraph
+        if (numberedListItems.length > 0) {
+          blocks.push(
+            ...numberedListItems.map((item) => ({
+              type: "numberedListItem" as const,
+              content: parseMarkdownText(item),
+            }))
+          );
+          numberedListItems.length = 0;
+        }
+        inNumberedList = false;
+      }
+      currentParagraph.push(trimmedLine);
+    }
+  }
+
+  // Finish any remaining content
+  if (inNumberedList && numberedListItems.length > 0) {
+    blocks.push(
+      ...numberedListItems.map((item) => ({
+        type: "numberedListItem" as const,
+        content: parseMarkdownText(item),
+      }))
+    );
+  } else if (currentParagraph.length > 0) {
+    blocks.push({
       type: "paragraph",
-      content: [
-        {
-          type: "text",
-          text: text,
-          styles: {},
-        },
-      ],
-    };
-  });
+      content: parseMarkdownText(currentParagraph.join(" ")),
+    });
+  }
+
+  return blocks;
 }
 
 /**
