@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { FormErrors, ProposalFormData } from "@/types/proposal";
+import type { AIGeneratedContent, FormErrors, ProposalFormData } from "@/types/proposal";
 
 const PAYMENT_TERMS_OPTIONS = [
   "50% entrada, 50% entrega",
@@ -33,6 +33,8 @@ export function ProposalForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<AIGeneratedContent | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const validateForm = (data: ProposalFormData = formData): boolean => {
     const newErrors: FormErrors = {};
@@ -95,14 +97,27 @@ export function ProposalForm() {
 
     setFormData(updatedFormData);
     setIsSubmitting(true);
+    setApiError(null);
 
     try {
-      // TODO: Phase 2 - Call AI API here
-      console.log("Form submitted:", updatedFormData);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/generate-proposal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.details || errorData.error || "Failed to generate proposal");
+      }
+
+      const content: AIGeneratedContent = await response.json();
+      setGeneratedContent(content);
     } catch (error) {
       console.error("Error generating proposal:", error);
+      setApiError(error instanceof Error ? error.message : "Failed to generate proposal");
     } finally {
       setIsSubmitting(false);
     }
@@ -284,6 +299,37 @@ export function ProposalForm() {
           </select>
         </div>
       </div>
+
+      {/* API Error */}
+      {apiError && (
+        <div className="rounded-lg border border-red-300 bg-red-50 p-4">
+          <p className="font-semibold text-red-800">Erro ao gerar proposta</p>
+          <p className="text-sm text-red-600">{apiError}</p>
+        </div>
+      )}
+
+      {/* Generated Content */}
+      {generatedContent && (
+        <div className="space-y-4 rounded-lg border bg-green-50 p-6">
+          <h2 className="text-xl font-semibold text-green-800">✨ Conteúdo Gerado</h2>
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="mb-2 font-semibold text-green-700">Contexto/Problema</h3>
+              <div className="rounded-md bg-white p-4 text-sm leading-relaxed">
+                {generatedContent.context}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="mb-2 font-semibold text-green-700">Solução</h3>
+              <div className="rounded-md bg-white p-4 text-sm leading-relaxed">
+                {generatedContent.solution}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Submit Button */}
       <button
