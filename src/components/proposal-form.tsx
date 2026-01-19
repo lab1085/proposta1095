@@ -2,6 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { ProposalEditor } from "@/components/proposal-editor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -360,45 +361,25 @@ export function ProposalForm() {
         </Card>
       )}
 
-      {/* Generated Proposal */}
+      {/* Generated Proposal with BlockNote Editor */}
       {proposalSections && (
-        <Card className="bg-gradient-to-br from-green-50 to-blue-50">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                variant="outline"
+                size="sm"
+              >
+                🔄 Regenerar
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {proposalSections.map((section) => (
-              <Card key={section.id} className="shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">{section.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {section.type === "heading" && Array.isArray(section.content) && (
-                    <div className="space-y-1 text-muted-foreground">
-                      {section.content.map((line) => (
-                        <p key={line} className="text-sm">
-                          {line}
-                        </p>
-                      ))}
-                    </div>
-                  )}
-
-                  {section.type === "text" && typeof section.content === "string" && (
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                      {section.content}
-                    </div>
-                  )}
-
-                  {section.type === "list" && Array.isArray(section.content) && (
-                    <ul className="list-inside list-disc space-y-2 text-sm text-foreground">
-                      {section.content.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+          <CardContent>
+            <ProposalEditor sections={proposalSections} />
           </CardContent>
         </Card>
       )}
