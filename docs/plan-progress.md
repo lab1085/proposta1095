@@ -194,10 +194,11 @@ feat(phase-2): integrate vercel ai sdk with openrouter
 
 ## Summary
 
-**Overall Progress:** 2/6 phases complete (33.33%)
+**Overall Progress:** 3/6 phases complete (50%)
 
 **Next Steps:**
-1. Begin Phase 3: Content Assembly
-2. Create template sections (Capa, Sobre nós, Próximos passos, Validade)
-3. Build content assembly function to merge AI + templates + form data
-4. Format content structure for BlockNote consumption
+1. Begin Phase 4: BlockNote Editor Integration
+2. Install BlockNote dependencies (@blocknote/core, @blocknote/react)
+3. Create BlockNote editor component
+4. Convert proposal sections to BlockNote schema
+5. Implement "Regenerar" functionality

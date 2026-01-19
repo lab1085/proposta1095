@@ -1,6 +1,7 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
+import { assembleProposal, createProposalSections } from "@/lib/assembler";
 import { generateContextPrompt, generateSolutionPrompt } from "@/lib/prompts";
 import type { AIGeneratedContent, ProposalFormData } from "@/types/proposal";
 
@@ -41,7 +42,7 @@ async function generateAIContent(formData: ProposalFormData): Promise<AIGenerate
 
 /**
  * POST /api/generate-proposal
- * Generate AI-powered proposal content
+ * Generate complete assembled proposal with AI content
  */
 export async function POST(request: NextRequest) {
   try {
@@ -55,7 +56,14 @@ export async function POST(request: NextRequest) {
     // Generate AI content
     const aiContent = await generateAIContent(formData);
 
-    return NextResponse.json(aiContent);
+    // Assemble complete proposal
+    const proposal = assembleProposal(formData, aiContent);
+    const sections = createProposalSections(proposal);
+
+    return NextResponse.json({
+      proposal,
+      sections,
+    });
   } catch (error) {
     console.error("Error generating proposal:", error);
 

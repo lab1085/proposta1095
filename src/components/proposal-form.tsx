@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import type { AIGeneratedContent, FormErrors, ProposalFormData } from "@/types/proposal";
+import type {
+  FormErrors,
+  ProposalContent,
+  ProposalFormData,
+  ProposalSection,
+} from "@/types/proposal";
 
 const PAYMENT_TERMS_OPTIONS = [
   "50% entrada, 50% entrega",
@@ -33,7 +38,8 @@ export function ProposalForm() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<AIGeneratedContent | null>(null);
+  const [_proposal, setProposal] = useState<ProposalContent | null>(null);
+  const [proposalSections, setProposalSections] = useState<ProposalSection[] | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const validateForm = (data: ProposalFormData = formData): boolean => {
@@ -84,6 +90,38 @@ export function ProposalForm() {
     setDeliverableItems((prev) => prev.map((item) => (item.id === id ? { ...item, value } : item)));
   };
 
+  const loadTestData = () => {
+    const testData: ProposalFormData = {
+      clientName: "Maria Silva",
+      company: "Café Aroma Brasileiro",
+      problemDescription:
+        "A cafeteria não possui presença digital efetiva e está perdendo clientes para concorrentes que oferecem pedidos online. O sistema atual de pedidos por telefone é ineficiente e gera erros frequentes.",
+      solutionDescription:
+        "Desenvolver um aplicativo mobile e website integrados com sistema de pedidos online, pagamento digital e programa de fidelidade. A solução incluirá painel administrativo para gestão de pedidos e cardápio.",
+      deliverables: [
+        "Aplicativo mobile iOS e Android",
+        "Website responsivo com sistema de pedidos",
+        "Painel administrativo completo",
+        "Integração com sistema de pagamento",
+        "Programa de fidelidade e cupons",
+        "Treinamento da equipe",
+      ],
+      timeline: "12 semanas",
+      value: 85000,
+      paymentTerms: PAYMENT_TERMS_OPTIONS[1],
+    };
+
+    setFormData(testData);
+    setDeliverableItems(
+      testData.deliverables.map((value) => ({
+        id: crypto.randomUUID(),
+        value,
+      }))
+    );
+    setErrors({});
+    setApiError(null);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -113,8 +151,9 @@ export function ProposalForm() {
         throw new Error(errorData.details || errorData.error || "Failed to generate proposal");
       }
 
-      const content: AIGeneratedContent = await response.json();
-      setGeneratedContent(content);
+      const data = await response.json();
+      setProposal(data.proposal);
+      setProposalSections(data.sections);
     } catch (error) {
       console.error("Error generating proposal:", error);
       setApiError(error instanceof Error ? error.message : "Failed to generate proposal");
@@ -126,8 +165,21 @@ export function ProposalForm() {
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Gerador de Propostas</h1>
-        <p className="text-muted-foreground">Preencha os dados para gerar sua proposta comercial</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Gerador de Propostas</h1>
+            <p className="text-muted-foreground">
+              Preencha os dados para gerar sua proposta comercial
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={loadTestData}
+            className="rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          >
+            🧪 Carregar Dados de Teste
+          </button>
+        </div>
       </div>
 
       {/* Client Information */}
@@ -308,25 +360,41 @@ export function ProposalForm() {
         </div>
       )}
 
-      {/* Generated Content */}
-      {generatedContent && (
-        <div className="space-y-4 rounded-lg border bg-green-50 p-6">
-          <h2 className="text-xl font-semibold text-green-800">✨ Conteúdo Gerado</h2>
+      {/* Generated Proposal */}
+      {proposalSections && (
+        <div className="space-y-6 rounded-lg border bg-gradient-to-br from-green-50 to-blue-50 p-6">
+          <h2 className="text-2xl font-bold text-green-800">✨ Proposta Gerada</h2>
 
-          <div className="space-y-4">
-            <div>
-              <h3 className="mb-2 font-semibold text-green-700">Contexto/Problema</h3>
-              <div className="rounded-md bg-white p-4 text-sm leading-relaxed">
-                {generatedContent.context}
-              </div>
-            </div>
+          <div className="space-y-6">
+            {proposalSections.map((section) => (
+              <div key={section.id} className="rounded-lg bg-white p-6 shadow-sm">
+                <h3 className="mb-3 text-lg font-semibold text-gray-800">{section.title}</h3>
 
-            <div>
-              <h3 className="mb-2 font-semibold text-green-700">Solução</h3>
-              <div className="rounded-md bg-white p-4 text-sm leading-relaxed">
-                {generatedContent.solution}
+                {section.type === "heading" && Array.isArray(section.content) && (
+                  <div className="space-y-1 text-gray-700">
+                    {section.content.map((line) => (
+                      <p key={line} className="text-sm">
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                )}
+
+                {section.type === "text" && typeof section.content === "string" && (
+                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+                    {section.content}
+                  </div>
+                )}
+
+                {section.type === "list" && Array.isArray(section.content) && (
+                  <ul className="list-inside list-disc space-y-2 text-sm text-gray-700">
+                    {section.content.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-            </div>
+            ))}
           </div>
         </div>
       )}
