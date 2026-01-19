@@ -1,6 +1,19 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type {
   FormErrors,
   ProposalContent,
@@ -165,248 +178,235 @@ export function ProposalForm() {
   return (
     <form onSubmit={handleSubmit} className="mx-auto max-w-3xl space-y-8 p-6">
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Gerador de Propostas</h1>
             <p className="text-muted-foreground">
               Preencha os dados para gerar sua proposta comercial
             </p>
           </div>
-          <button
+          <Button
             type="button"
             onClick={loadTestData}
-            className="rounded-md border border-blue-500 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+            variant="outline"
+            className="w-full sm:w-auto"
           >
             🧪 Carregar Dados de Teste
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Client Information */}
-      <div className="space-y-4 rounded-lg border p-6">
-        <h2 className="text-xl font-semibold">Informações do Cliente</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Informações do Cliente</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="clientName">Nome do Cliente *</Label>
+            <Input
+              id="clientName"
+              value={formData.clientName}
+              onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+              placeholder="João Silva"
+            />
+            {errors.clientName && <p className="text-sm text-destructive">{errors.clientName}</p>}
+          </div>
 
-        <div className="space-y-2">
-          <label htmlFor="clientName" className="block text-sm font-medium">
-            Nome do Cliente *
-          </label>
-          <input
-            id="clientName"
-            type="text"
-            value={formData.clientName}
-            onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="João Silva"
-          />
-          {errors.clientName && <p className="text-sm text-red-600">{errors.clientName}</p>}
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="company" className="block text-sm font-medium">
-            Empresa *
-          </label>
-          <input
-            id="company"
-            type="text"
-            value={formData.company}
-            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Restaurante Sabor & Arte"
-          />
-          {errors.company && <p className="text-sm text-red-600">{errors.company}</p>}
-        </div>
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="company">Empresa *</Label>
+            <Input
+              id="company"
+              value={formData.company}
+              onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+              placeholder="Restaurante Sabor & Arte"
+            />
+            {errors.company && <p className="text-sm text-destructive">{errors.company}</p>}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Problem & Solution */}
-      <div className="space-y-4 rounded-lg border p-6">
-        <h2 className="text-xl font-semibold">Problema e Solução</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Problema e Solução</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="problemDescription">Descrição do Problema *</Label>
+            <Textarea
+              id="problemDescription"
+              value={formData.problemDescription}
+              onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
+              rows={4}
+              placeholder="Descreva brevemente o problema do cliente (2-3 frases)"
+            />
+            {errors.problemDescription && (
+              <p className="text-sm text-destructive">{errors.problemDescription}</p>
+            )}
+          </div>
 
-        <div className="space-y-2">
-          <label htmlFor="problemDescription" className="block text-sm font-medium">
-            Descrição do Problema *
-          </label>
-          <textarea
-            id="problemDescription"
-            value={formData.problemDescription}
-            onChange={(e) => setFormData({ ...formData, problemDescription: e.target.value })}
-            rows={4}
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Descreva brevemente o problema do cliente (2-3 frases)"
-          />
-          {errors.problemDescription && (
-            <p className="text-sm text-red-600">{errors.problemDescription}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="solutionDescription" className="block text-sm font-medium">
-            Descrição da Solução *
-          </label>
-          <textarea
-            id="solutionDescription"
-            value={formData.solutionDescription}
-            onChange={(e) => setFormData({ ...formData, solutionDescription: e.target.value })}
-            rows={4}
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Descreva brevemente a solução proposta"
-          />
-          {errors.solutionDescription && (
-            <p className="text-sm text-red-600">{errors.solutionDescription}</p>
-          )}
-        </div>
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="solutionDescription">Descrição da Solução *</Label>
+            <Textarea
+              id="solutionDescription"
+              value={formData.solutionDescription}
+              onChange={(e) => setFormData({ ...formData, solutionDescription: e.target.value })}
+              rows={4}
+              placeholder="Descreva brevemente a solução proposta"
+            />
+            {errors.solutionDescription && (
+              <p className="text-sm text-destructive">{errors.solutionDescription}</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Deliverables */}
-      <div className="space-y-4 rounded-lg border p-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Entregas</h2>
-          <button
-            type="button"
-            onClick={addDeliverable}
-            className="rounded-md bg-primary px-3 py-1 text-sm text-primary-foreground hover:bg-primary/90"
-          >
-            + Adicionar
-          </button>
-        </div>
-
-        <div className="space-y-3">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Entregas</CardTitle>
+            <Button type="button" onClick={addDeliverable} size="sm">
+              + Adicionar
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
           {deliverableItems.map((item, index) => (
             <div key={item.id} className="flex gap-2">
-              <input
-                type="text"
+              <Input
                 value={item.value}
                 onChange={(e) => updateDeliverable(item.id, e.target.value)}
-                className="flex-1 rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder={`Entrega ${index + 1}`}
               />
               {deliverableItems.length > 1 && (
-                <button
+                <Button
                   type="button"
                   onClick={() => removeDeliverable(item.id)}
-                  className="rounded-md border px-3 py-2 text-red-600 hover:bg-red-50"
+                  variant="destructive"
+                  size="icon"
                 >
-                  Remover
-                </button>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               )}
             </div>
           ))}
-        </div>
-
-        {errors.deliverables && <p className="text-sm text-red-600">{errors.deliverables}</p>}
-      </div>
+          {errors.deliverables && <p className="text-sm text-destructive">{errors.deliverables}</p>}
+        </CardContent>
+      </Card>
 
       {/* Timeline & Budget */}
-      <div className="space-y-4 rounded-lg border p-6">
-        <h2 className="text-xl font-semibold">Cronograma e Investimento</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Cronograma e Investimento</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="timeline">Prazo *</Label>
+              <Input
+                id="timeline"
+                value={formData.timeline}
+                onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
+                placeholder="8 semanas"
+              />
+              {errors.timeline && <p className="text-sm text-destructive">{errors.timeline}</p>}
+            </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="timeline" className="block text-sm font-medium">
-              Prazo *
-            </label>
-            <input
-              id="timeline"
-              type="text"
-              value={formData.timeline}
-              onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-              className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="8 semanas"
-            />
-            {errors.timeline && <p className="text-sm text-red-600">{errors.timeline}</p>}
+            <div className="space-y-2">
+              <Label htmlFor="value">Valor (R$) *</Label>
+              <Input
+                id="value"
+                type="number"
+                value={formData.value || ""}
+                onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
+                placeholder="45000"
+                min="0"
+                step="0.01"
+              />
+              {errors.value && <p className="text-sm text-destructive">{errors.value}</p>}
+            </div>
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="value" className="block text-sm font-medium">
-              Valor (R$) *
-            </label>
-            <input
-              id="value"
-              type="number"
-              value={formData.value || ""}
-              onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
-              className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="45000"
-              min="0"
-              step="0.01"
-            />
-            {errors.value && <p className="text-sm text-red-600">{errors.value}</p>}
+            <Label htmlFor="paymentTerms">Condições de Pagamento</Label>
+            <Select
+              value={formData.paymentTerms}
+              onValueChange={(value) => setFormData({ ...formData, paymentTerms: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAYMENT_TERMS_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="paymentTerms" className="block text-sm font-medium">
-            Condições de Pagamento
-          </label>
-          <select
-            id="paymentTerms"
-            value={formData.paymentTerms}
-            onChange={(e) => setFormData({ ...formData, paymentTerms: e.target.value })}
-            className="w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            {PAYMENT_TERMS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* API Error */}
       {apiError && (
-        <div className="rounded-lg border border-red-300 bg-red-50 p-4">
-          <p className="font-semibold text-red-800">Erro ao gerar proposta</p>
-          <p className="text-sm text-red-600">{apiError}</p>
-        </div>
+        <Card className="border-destructive">
+          <CardContent className="pt-6">
+            <p className="font-semibold text-destructive">Erro ao gerar proposta</p>
+            <p className="text-sm text-muted-foreground">{apiError}</p>
+          </CardContent>
+        </Card>
       )}
 
       {/* Generated Proposal */}
       {proposalSections && (
-        <div className="space-y-6 rounded-lg border bg-gradient-to-br from-green-50 to-blue-50 p-6">
-          <h2 className="text-2xl font-bold text-green-800">✨ Proposta Gerada</h2>
-
-          <div className="space-y-6">
+        <Card className="bg-gradient-to-br from-green-50 to-blue-50">
+          <CardHeader>
+            <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
             {proposalSections.map((section) => (
-              <div key={section.id} className="rounded-lg bg-white p-6 shadow-sm">
-                <h3 className="mb-3 text-lg font-semibold text-gray-800">{section.title}</h3>
+              <Card key={section.id} className="shadow-sm">
+                <CardHeader>
+                  <CardTitle className="text-lg">{section.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {section.type === "heading" && Array.isArray(section.content) && (
+                    <div className="space-y-1 text-muted-foreground">
+                      {section.content.map((line) => (
+                        <p key={line} className="text-sm">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
 
-                {section.type === "heading" && Array.isArray(section.content) && (
-                  <div className="space-y-1 text-gray-700">
-                    {section.content.map((line) => (
-                      <p key={line} className="text-sm">
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                )}
+                  {section.type === "text" && typeof section.content === "string" && (
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                      {section.content}
+                    </div>
+                  )}
 
-                {section.type === "text" && typeof section.content === "string" && (
-                  <div className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
-                    {section.content}
-                  </div>
-                )}
-
-                {section.type === "list" && Array.isArray(section.content) && (
-                  <ul className="list-inside list-disc space-y-2 text-sm text-gray-700">
-                    {section.content.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                  {section.type === "list" && Array.isArray(section.content) && (
+                    <ul className="list-inside list-disc space-y-2 text-sm text-foreground">
+                      {section.content.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  )}
+                </CardContent>
+              </Card>
             ))}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-md bg-primary px-6 py-3 text-lg font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
         {isSubmitting ? "Gerando proposta..." : "Gerar Proposta"}
-      </button>
+      </Button>
     </form>
   );
 }
