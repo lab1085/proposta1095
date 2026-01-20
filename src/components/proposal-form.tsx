@@ -183,6 +183,25 @@ export function ProposalForm() {
     editorRef.current?.clearStorage();
   };
 
+  const resetAll = () => {
+    clearAllStorage();
+    setFormData({
+      clientName: "",
+      company: "",
+      problemDescription: "",
+      solutionDescription: "",
+      deliverables: [""],
+      timeline: "",
+      value: 0,
+      paymentTerms: PAYMENT_TERMS_OPTIONS[0],
+    });
+    setDeliverableItems([{ id: crypto.randomUUID(), value: "" }]);
+    setProposal(null);
+    setProposalSections(null);
+    setErrors({});
+    setApiError(null);
+  };
+
   const loadTestData = () => {
     const testData: ProposalFormData = {
       clientName: "Maria Silva",
@@ -474,14 +493,24 @@ export function ProposalForm() {
   const Header = () => (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Gerador de Propostas</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta.ai</h1>
         <p className="text-sm text-muted-foreground sm:text-base">
           Preencha os dados para gerar sua proposta comercial
         </p>
       </div>
-      <Button type="button" onClick={loadTestData} variant="outline" className="w-full sm:w-auto">
-        🧪 Carregar Dados de Teste
-      </Button>
+      <div className="flex w-full gap-2 sm:w-auto">
+        <Button
+          type="button"
+          onClick={loadTestData}
+          variant="outline"
+          className="flex-1 sm:flex-none"
+        >
+          🧪 Teste
+        </Button>
+        <Button type="button" onClick={resetAll} variant="ghost" className="flex-1 sm:flex-none">
+          🗑️ Limpar
+        </Button>
+      </div>
     </div>
   );
 
