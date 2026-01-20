@@ -441,8 +441,8 @@ export function ProposalForm() {
   const ProposalCard = () => (
     <Card className="h-full">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-2xl">✨ Proposta Gerada</CardTitle>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-xl sm:text-2xl">✨ Proposta Gerada</CardTitle>
           <div className="flex gap-2">
             <Button
               type="button"
@@ -470,29 +470,51 @@ export function ProposalForm() {
     </Card>
   );
 
+  // Header component shared across layouts
+  const Header = () => (
+    <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Gerador de Propostas</h1>
+        <p className="text-sm text-muted-foreground sm:text-base">
+          Preencha os dados para gerar sua proposta comercial
+        </p>
+      </div>
+      <Button type="button" onClick={loadTestData} variant="outline" className="w-full sm:w-auto">
+        🧪 Carregar Dados de Teste
+      </Button>
+    </div>
+  );
+
+  // Desktop split-view layout with independent scroll areas
+  if (proposalSections && isDesktop) {
+    return (
+      <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
+        <div className="shrink-0 border-b bg-background px-6 py-4">
+          <div className="mx-auto max-w-7xl">
+            <Header />
+          </div>
+        </div>
+        <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 gap-6 px-6">
+          <div className="w-[45%] overflow-y-auto pr-4 pt-4">
+            <div className="space-y-8 pb-6">
+              <FormContent />
+            </div>
+          </div>
+          <div className="w-[55%] overflow-y-auto pl-2 pt-4">
+            <div className="pb-6">
+              <ProposalCard />
+            </div>
+          </div>
+        </div>
+      </form>
+    );
+  }
+
+  // Default layout (no proposal or mobile/tablet)
   return (
     <form onSubmit={handleSubmit} className="h-full">
       <div className="mx-auto max-w-7xl space-y-6 p-3 sm:p-6">
-        <div className="space-y-2">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                Gerador de Propostas
-              </h1>
-              <p className="text-sm text-muted-foreground sm:text-base">
-                Preencha os dados para gerar sua proposta comercial
-              </p>
-            </div>
-            <Button
-              type="button"
-              onClick={loadTestData}
-              variant="outline"
-              className="w-full sm:w-auto"
-            >
-              🧪 Carregar Dados de Teste
-            </Button>
-          </div>
-        </div>
+        <Header />
 
         {/* Before proposal is generated - single column form */}
         {!proposalSections && (
@@ -501,21 +523,8 @@ export function ProposalForm() {
           </div>
         )}
 
-        {/* After proposal - ONE editor, conditional layout based on screen size */}
-        {proposalSections && isDesktop && (
-          /* Desktop Split View */
-          <div className="grid gap-6 grid-cols-[45%_55%]">
-            <div className="space-y-8 overflow-y-auto">
-              <FormContent />
-            </div>
-            <div className="sticky top-6 h-[calc(100vh-8rem)] overflow-y-auto">
-              <ProposalCard />
-            </div>
-          </div>
-        )}
-
+        {/* Mobile/Tablet Tabs */}
         {proposalSections && !isDesktop && (
-          /* Mobile/Tablet Tabs */
           <Tabs defaultValue="proposal" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="form">Formulário</TabsTrigger>
