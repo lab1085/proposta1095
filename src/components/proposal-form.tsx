@@ -30,6 +30,12 @@ const PAYMENT_TERMS_OPTIONS = [
   "Personalizado",
 ];
 
+const STORAGE_KEYS = {
+  formData: "proposal-form-data",
+  deliverables: "proposal-deliverables",
+  sections: "proposal-sections",
+};
+
 interface DeliverableItem {
   id: string;
   value: string;
@@ -38,6 +44,7 @@ interface DeliverableItem {
 export function ProposalForm() {
   const editorRef = useRef<ProposalEditorRef>(null);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [formData, setFormData] = useState<ProposalFormData>({
     clientName: "",
     company: "",
@@ -58,6 +65,60 @@ export function ProposalForm() {
   const [_proposal, setProposal] = useState<ProposalContent | null>(null);
   const [proposalSections, setProposalSections] = useState<ProposalSection[] | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedFormData = localStorage.getItem(STORAGE_KEYS.formData);
+      const savedDeliverables = localStorage.getItem(STORAGE_KEYS.deliverables);
+      const savedSections = localStorage.getItem(STORAGE_KEYS.sections);
+
+      if (savedFormData) {
+        setFormData(JSON.parse(savedFormData));
+      }
+      if (savedDeliverables) {
+        setDeliverableItems(JSON.parse(savedDeliverables));
+      }
+      if (savedSections) {
+        setProposalSections(JSON.parse(savedSections));
+      }
+    } catch (err) {
+      console.error("Failed to load from localStorage:", err);
+    }
+    setIsHydrated(true);
+  }, []);
+
+  // Save formData to localStorage
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.formData, JSON.stringify(formData));
+    } catch (err) {
+      console.error("Failed to save formData:", err);
+    }
+  }, [formData, isHydrated]);
+
+  // Save deliverableItems to localStorage
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEYS.deliverables, JSON.stringify(deliverableItems));
+    } catch (err) {
+      console.error("Failed to save deliverables:", err);
+    }
+  }, [deliverableItems, isHydrated]);
+
+  // Save proposalSections to localStorage
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      if (proposalSections) {
+        localStorage.setItem(STORAGE_KEYS.sections, JSON.stringify(proposalSections));
+      }
+    } catch (err) {
+      console.error("Failed to save sections:", err);
+    }
+  }, [proposalSections, isHydrated]);
 
   // Detect screen size - only render one layout at a time
   useEffect(() => {
@@ -115,6 +176,13 @@ export function ProposalForm() {
     setDeliverableItems((prev) => prev.map((item) => (item.id === id ? { ...item, value } : item)));
   };
 
+  const clearAllStorage = () => {
+    localStorage.removeItem(STORAGE_KEYS.formData);
+    localStorage.removeItem(STORAGE_KEYS.deliverables);
+    localStorage.removeItem(STORAGE_KEYS.sections);
+    editorRef.current?.clearStorage();
+  };
+
   const loadTestData = () => {
     const testData: ProposalFormData = {
       clientName: "Maria Silva",
@@ -135,6 +203,10 @@ export function ProposalForm() {
       value: 85000,
       paymentTerms: PAYMENT_TERMS_OPTIONS[1],
     };
+
+    // Clear existing proposal when loading test data
+    setProposalSections(null);
+    clearAllStorage();
 
     setFormData(testData);
     setDeliverableItems(
@@ -177,6 +249,8 @@ export function ProposalForm() {
       }
 
       const data = await response.json();
+      // Clear editor storage before setting new sections (regeneration)
+      editorRef.current?.clearStorage();
       setProposal(data.proposal);
       setProposalSections(data.sections);
     } catch (error) {
