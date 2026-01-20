@@ -84,8 +84,23 @@ export const ProposalEditor = forwardRef<ProposalEditorRef, ProposalEditorProps>
           // Get current editor content (live state)
           const currentBlocks = editor.document;
 
-          // Create PDF exporter
+          // Create PDF exporter with custom styles to match editor appearance
           const exporter = new PDFExporter(editor.schema, pdfDefaultSchemaMappings);
+
+          // Override default styles to better match the editor's visual appearance
+          exporter.styles.page = {
+            ...exporter.styles.page,
+            fontSize: 14,
+            lineHeight: 1.8,
+            paddingTop: 50,
+            paddingBottom: 60,
+            paddingHorizontal: 50,
+          };
+
+          // Add vertical spacing between blocks (overrides default 2.25pt)
+          exporter.styles.block = {
+            paddingVertical: 6,
+          };
 
           // Convert blocks to React-PDF document
           const pdfDocument = await exporter.toReactPDFDocument(currentBlocks);

@@ -137,6 +137,19 @@
   padding-right: 0 !important;
 }
 
+/* BlockNote heading sizes - override to match PDF export proportions */
+[data-content-type="heading"] {
+  --level: 2em !important;
+}
+
+[data-content-type="heading"][data-level="2"] {
+  --level: 1.5em !important;
+}
+
+[data-content-type="heading"][data-level="3"] {
+  --level: 1.17em !important;
+}
+
 /* Print Styles for PDF Export */
 @media print {
   /* Hide everything except the proposal content */
