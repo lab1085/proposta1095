@@ -493,7 +493,7 @@ export function ProposalForm() {
   const Header = () => (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposal1095</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta1095</h1>
         <p className="text-sm text-muted-foreground sm:text-base">
           Preencha os dados para gerar sua proposta comercial
         </p>
