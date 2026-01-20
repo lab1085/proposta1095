@@ -154,7 +154,7 @@
 @media print {
   /* Hide everything except the proposal content */
   body * {
-    visibility: hidden;
+    visibility: hidden;;
   }
 
   /* Only show the proposal editor and its parents */
