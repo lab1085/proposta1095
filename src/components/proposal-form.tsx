@@ -493,7 +493,7 @@ export function ProposalForm() {
   const Header = () => (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta.ai</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposal1095</h1>
         <p className="text-sm text-muted-foreground sm:text-base">
           Preencha os dados para gerar sua proposta comercial
         </p>
@@ -541,32 +541,37 @@ export function ProposalForm() {
 
   // Default layout (no proposal or mobile/tablet)
   return (
-    <form onSubmit={handleSubmit} className="h-full">
-      <div className="mx-auto max-w-7xl space-y-6 p-3 sm:p-6">
-        <Header />
-
-        {/* Before proposal is generated - single column form */}
-        {!proposalSections && (
-          <div className="mx-auto max-w-3xl space-y-8">
-            <FormContent />
-          </div>
-        )}
-
-        {/* Mobile/Tablet Tabs */}
-        {proposalSections && !isDesktop && (
-          <Tabs defaultValue="proposal" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="form">Formulário</TabsTrigger>
-              <TabsTrigger value="proposal">Proposta</TabsTrigger>
-            </TabsList>
-            <TabsContent value="form" className="space-y-8">
+    <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
+      <div className="shrink-0 border-b bg-background px-6 py-4">
+        <div className="mx-auto max-w-7xl">
+          <Header />
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto px-6">
+        <div className="mx-auto max-w-7xl space-y-6 py-6">
+          {/* Before proposal is generated - single column form */}
+          {!proposalSections && (
+            <div className="mx-auto max-w-3xl space-y-8">
               <FormContent />
-            </TabsContent>
-            <TabsContent value="proposal">
-              <ProposalCard />
-            </TabsContent>
-          </Tabs>
-        )}
+            </div>
+          )}
+
+          {/* Mobile/Tablet Tabs */}
+          {proposalSections && !isDesktop && (
+            <Tabs defaultValue="proposal" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="form">Formulário</TabsTrigger>
+                <TabsTrigger value="proposal">Proposta</TabsTrigger>
+              </TabsList>
+              <TabsContent value="form" className="space-y-8">
+                <FormContent />
+              </TabsContent>
+              <TabsContent value="proposal">
+                <ProposalCard />
+              </TabsContent>
+            </Tabs>
+          )}
+        </div>
       </div>
     </form>
   );
