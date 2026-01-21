@@ -506,7 +506,7 @@ export function ProposalForm() {
   // Desktop split-view layout with independent scroll areas
   if (proposalSections && isDesktop) {
     return (
-      <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
+      <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col bg-secondary">
         <div className="shrink-0 border-b bg-background px-6 py-4">
           <div className="mx-auto max-w-7xl">{header}</div>
         </div>
@@ -524,7 +524,7 @@ export function ProposalForm() {
 
   // Default layout (no proposal or mobile/tablet)
   return (
-    <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
+    <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col bg-secondary">
       <div className="shrink-0 border-b bg-background px-6 py-4">
         <div className="mx-auto max-w-7xl">{header}</div>
       </div>
