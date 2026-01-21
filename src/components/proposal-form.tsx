@@ -478,11 +478,14 @@ export function ProposalForm() {
   // Header JSX shared across layouts
   const header = (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta1095</h1>
-        <p className="text-sm text-muted-foreground sm:text-base">
-          Preencha os dados para gerar sua proposta comercial
-        </p>
+      <div className="flex items-center gap-3">
+        <img src="/logo.jpg" alt="Proposta1095" className="h-10 w-10 rounded-lg sm:h-12 sm:w-12" />
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta1095</h1>
+          <p className="text-sm text-muted-foreground sm:text-base">
+            Preencha os dados para gerar sua proposta comercial
+          </p>
+        </div>
       </div>
       <div className="flex w-full gap-2 sm:w-auto">
         <Button
