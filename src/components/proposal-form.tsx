@@ -1,27 +1,26 @@
-"use client";
-
 import { Trash2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { ProposalEditor, type ProposalEditorRef } from "@/components/proposal-editor";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ProposalEditor, type ProposalEditorRef } from "~/components/proposal-editor";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
+} from "~/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Textarea } from "~/components/ui/textarea";
 import type {
   FormErrors,
   ProposalContent,
   ProposalFormData,
   ProposalSection,
-} from "@/types/proposal";
+} from "~/types/proposal";
+import { generateProposal } from "~/utils/proposal";
 
 const PAYMENT_TERMS_OPTIONS = [
   "50% entrada, 50% entrega",
@@ -254,34 +253,21 @@ export function ProposalForm() {
     setApiError(null);
 
     try {
-      const response = await fetch("/api/generate-proposal", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedFormData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.details || errorData.error || "Failed to generate proposal");
-      }
-
-      const data = await response.json();
+      const data = await generateProposal({ data: updatedFormData });
       // Clear editor storage before setting new sections (regeneration)
       editorRef.current?.clearStorage();
       setProposal(data.proposal);
       setProposalSections(data.sections);
-    } catch (error) {
-      console.error("Error generating proposal:", error);
-      setApiError(error instanceof Error ? error.message : "Failed to generate proposal");
+    } catch (err) {
+      console.error("Error generating proposal:", err);
+      setApiError(err instanceof Error ? err.message : "Failed to generate proposal");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Form Content Component (reusable for both split view and tabs)
-  const FormContent = () => (
+  // Form content JSX (not a component to avoid remounting on re-render)
+  const formContent = (
     <>
       {/* Client Information */}
       <Card>
@@ -456,8 +442,8 @@ export function ProposalForm() {
     </>
   );
 
-  // Single Proposal Card - renders editor only once
-  const ProposalCard = () => (
+  // Proposal card JSX
+  const proposalCard = (
     <Card className="h-full">
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -489,8 +475,8 @@ export function ProposalForm() {
     </Card>
   );
 
-  // Header component shared across layouts
-  const Header = () => (
+  // Header JSX shared across layouts
+  const header = (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div>
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Proposta1095</h1>
@@ -519,20 +505,14 @@ export function ProposalForm() {
     return (
       <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
         <div className="shrink-0 border-b bg-background px-6 py-4">
-          <div className="mx-auto max-w-7xl">
-            <Header />
-          </div>
+          <div className="mx-auto max-w-7xl">{header}</div>
         </div>
         <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 gap-6 px-6">
           <div className="w-[45%] overflow-y-auto pr-4 pt-4">
-            <div className="space-y-8 pb-6">
-              <FormContent />
-            </div>
+            <div className="space-y-8 pb-6">{formContent}</div>
           </div>
           <div className="w-[55%] overflow-y-auto pl-2 pt-4">
-            <div className="pb-6">
-              <ProposalCard />
-            </div>
+            <div className="pb-6">{proposalCard}</div>
           </div>
         </div>
       </form>
@@ -543,18 +523,12 @@ export function ProposalForm() {
   return (
     <form onSubmit={handleSubmit} className="fixed inset-0 flex flex-col">
       <div className="shrink-0 border-b bg-background px-6 py-4">
-        <div className="mx-auto max-w-7xl">
-          <Header />
-        </div>
+        <div className="mx-auto max-w-7xl">{header}</div>
       </div>
       <div className="flex-1 overflow-y-auto px-6">
         <div className="mx-auto max-w-7xl space-y-6 py-6">
           {/* Before proposal is generated - single column form */}
-          {!proposalSections && (
-            <div className="mx-auto max-w-3xl space-y-8">
-              <FormContent />
-            </div>
-          )}
+          {!proposalSections && <div className="mx-auto max-w-3xl space-y-8">{formContent}</div>}
 
           {/* Mobile/Tablet Tabs */}
           {proposalSections && !isDesktop && (
@@ -564,11 +538,9 @@ export function ProposalForm() {
                 <TabsTrigger value="proposal">Proposta</TabsTrigger>
               </TabsList>
               <TabsContent value="form" className="space-y-8">
-                <FormContent />
+                {formContent}
               </TabsContent>
-              <TabsContent value="proposal">
-                <ProposalCard />
-              </TabsContent>
+              <TabsContent value="proposal">{proposalCard}</TabsContent>
             </Tabs>
           )}
         </div>

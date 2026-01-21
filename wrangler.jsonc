@@ -1,15 +1,9 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "proposta1095",
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2025-03-01",
-  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "assets": {
-    "binding": "ASSETS",
-    "directory": ".open-next/assets"
-  },
-  "observability": {
-    "enabled": true
-  },
-  "placement": { "mode": "smart" }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "proposta1095",
+	"compatibility_date": "2025-03-01",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "@tanstack/react-start/server-entry",
+	"observability": { "enabled": true },
+	"placement": { "mode": "smart" }
 }

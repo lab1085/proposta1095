@@ -1,4 +1,4 @@
-import type { ProposalFormData } from "@/types/proposal";
+import type { ProposalFormData } from "~/types/proposal";
 
 /**
  * Generate prompt for "Contexto/Problema" section
