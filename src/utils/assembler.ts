@@ -3,7 +3,7 @@ import type {
   ProposalContent,
   ProposalFormData,
   ProposalSection,
-} from "@/types/proposal";
+} from "~/types/proposal";
 import { generateTemplateSections } from "./templates";
 
 /**

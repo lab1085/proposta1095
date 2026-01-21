@@ -1,4 +1,4 @@
-import type { TemplateSections } from "@/types/proposal";
+import type { TemplateSections } from "~/types/proposal";
 
 /**
  * Generate template sections with dynamic data

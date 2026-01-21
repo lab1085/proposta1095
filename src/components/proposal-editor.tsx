@@ -1,5 +1,3 @@
-"use client";
-
 import "@blocknote/core/fonts/inter.css";
 import type { Block } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
@@ -8,8 +6,8 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { PDFExporter, pdfDefaultSchemaMappings } from "@blocknote/xl-pdf-exporter";
 import * as ReactPDF from "@react-pdf/renderer";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
-import { convertProposalToBlocks } from "@/lib/blocknote-converter";
-import type { ProposalSection } from "@/types/proposal";
+import type { ProposalSection } from "~/types/proposal";
+import { convertProposalToBlocks } from "~/utils/blocknote-converter";
 
 const STORAGE_KEY = "proposal-editor-content";
 

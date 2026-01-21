@@ -1,5 +1,5 @@
 import type { Block, PartialBlock } from "@blocknote/core";
-import type { ProposalSection } from "@/types/proposal";
+import type { ProposalSection } from "~/types/proposal";
 
 /**
  * Parse markdown inline styles (bold, italic) and convert to BlockNote format
