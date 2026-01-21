@@ -9,7 +9,7 @@ const openrouter = createOpenRouter({
   apiKey: process.env.OPENROUTER_API_KEY || "",
 });
 
-const MODEL = "openai/gpt-5-mini";
+const MODEL = "x-ai/grok-4.1-fast";
 
 /**
  * Generate AI content using Vercel AI SDK with OpenRouter
